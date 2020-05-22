@@ -1,3 +1,5 @@
+from random import randint
+
 # Note: coordinates (x, y) is field[y][x]
 
 field = [[' ' for j in range(4)] for i in range(4)]
@@ -33,6 +35,11 @@ def populate_field():
             elif char == 'O':
                 num_o += 1
             input_index += 1
+
+
+def empty_field():
+    for i in range(3, 0, -1):
+        field[i][0] = '|'
 
 
 def print_field():
@@ -75,17 +82,35 @@ def analyse_field():
         wins = True
     if not wins and num_x + num_o < 9:
         print("Game not finished")
+        return False
     elif not wins and num_x + num_o == 9:
         print("Draw")
     elif wins and num_x == num_o:
         print("O wins")
     else:
         print("X wins")
+    return True
+
+
+def play_random():
+    print('Making move level "easy"')
+    while True:
+        x = randint(1, 3)
+        y = randint(1, 3)
+        if field[y][x] != " ":
+            continue
+        field[y][x] = next_move()
+        break
 
 
 if __name__ == "__main__":
-    populate_field()
+    # populate_field()
+    empty_field()
     print_field()
     get_coordinates()
     print_field()
-    analyse_field()
+    while not analyse_field():
+        if num_x == num_o:
+            get_coordinates()
+        else:
+            play_random()
