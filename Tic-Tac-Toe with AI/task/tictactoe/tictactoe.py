@@ -38,6 +38,8 @@ def populate_field():
 
 
 def empty_field():
+    global field
+    field = [[' ' for j in range(4)] for i in range(4)]
     for i in range(3, 0, -1):
         field[i][0] = '|'
 
@@ -81,7 +83,7 @@ def analyse_field():
             (field[1][1] == field[2][2] and field[2][2] == field[3][3] and field[3][3] != " "):
         wins = True
     if not wins and num_x + num_o < 9:
-        print("Game not finished")
+        # print("Game not finished")
         return False
     elif not wins and num_x + num_o == 9:
         print("Draw")
@@ -104,13 +106,32 @@ def play_random():
 
 
 if __name__ == "__main__":
-    # populate_field()
-    empty_field()
-    print_field()
-    get_coordinates()
-    print_field()
-    while not analyse_field():
-        if num_x == num_o:
+    modes = ['user', 'easy']
+    while True:
+        parameters = input("Input command: ").split()
+        if len(parameters) == 1 and parameters[0] == 'exit':
+            break
+        if len(parameters) < 3 or parameters[0] != 'start' or \
+                parameters[1] not in modes or parameters[2] not in modes:
+            print("Bad parameters!")
+            continue
+
+        # populate_field()
+        empty_field()
+        print_field()
+
+        parameters.pop(0)
+        turn = 0
+        if parameters[turn % 2] == 'user':
             get_coordinates()
         else:
             play_random()
+        turn += 1
+        print_field()
+        while not analyse_field():
+            if parameters[turn % 2] == 'user':
+                get_coordinates()
+            else:
+                play_random()
+            turn += 1
+            print_field()
