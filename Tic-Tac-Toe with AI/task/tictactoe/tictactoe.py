@@ -21,6 +21,9 @@ def next_move():
 def populate_field():
     global num_x, num_o
 
+    num_x = 0
+    num_o = 0
+
     field_input = input("Enter cells: ")
     input_index = 0
 
@@ -38,7 +41,11 @@ def populate_field():
 
 
 def empty_field():
-    global field
+    global num_x, num_o, field
+
+    num_x = 0
+    num_o = 0
+
     field = [[' ' for j in range(4)] for i in range(4)]
     for i in range(3, 0, -1):
         field[i][0] = '|'
@@ -69,19 +76,23 @@ def get_coordinates():
             print("You should enter numbers!")
 
 
-def analyse_field():
-    wins = False
+def has_won():
     if (field[3][1] == field[3][2] and field[3][2] == field[3][3] and field[3][3] != " ") or \
             (field[2][1] == field[2][2] and field[2][2] == field[2][3] and field[2][3] != " ") or \
             (field[1][1] == field[1][2] and field[1][2] == field[1][3] and field[1][3] != " "):
-        wins = True
+        return True
     elif (field[3][1] == field[2][1] and field[2][1] == field[1][1] and field[1][1] != " ") or \
             (field[3][2] == field[2][2] and field[2][2] == field[1][2] and field[1][2] != " ") or \
             (field[3][3] == field[2][3] and field[2][3] == field[1][3] and field[1][3] != " "):
-        wins = True
+        return True
     elif (field[3][1] == field[2][2] and field[2][2] == field[1][3] and field[1][3] != " ") or \
             (field[1][1] == field[2][2] and field[2][2] == field[3][3] and field[3][3] != " "):
-        wins = True
+        return True
+    return False
+
+
+def analyse_field():
+    wins = has_won()
     if not wins and num_x + num_o < 9:
         # print("Game not finished")
         return False
@@ -94,8 +105,18 @@ def analyse_field():
     return True
 
 
+def play_move(parameters, turn):
+    if parameters[turn % 2] == 'user':
+        get_coordinates()
+    elif parameters[turn % 2] == 'easy':
+        print('Making move level "easy"')
+        play_random()
+    else:
+        print('Making move level "medium"')
+        play_medium()
+
+
 def play_random():
-    print('Making move level "easy"')
     while True:
         x = randint(1, 3)
         y = randint(1, 3)
@@ -105,8 +126,45 @@ def play_random():
         break
 
 
+def play_medium():
+    if not to_win() and not to_block():
+        play_random()
+
+
+def to_win():
+    move = 'X' if num_x == num_o else 'O'
+    if move == 'X' and num_x < 2 or move == 'O' and num_o < 2:
+        return False
+    for i in range(3, 0, -1):
+        for j in range(1, 4):
+            if field[i][j] == ' ':
+                field[i][j] = next_move()
+                if has_won():
+                    return True
+                else:
+                    field[i][j] = ' '
+    return False
+
+
+def to_block():
+    my_move = 'X' if num_x == num_o else 'O'
+    opp_move = 'O' if num_x == num_o else 'X'
+    if opp_move == 'X' and num_x < 2 or opp_move == 'O' and num_o < 2:
+        return False
+    for i in range(3, 0, -1):
+        for j in range(1, 4):
+            if field[i][j] == ' ':
+                field[i][j] = opp_move
+                if has_won():
+                    field[i][j] = next_move()
+                    return True
+                else:
+                    field[i][j] = ' '
+    return False
+
+
 if __name__ == "__main__":
-    modes = ['user', 'easy']
+    modes = ['user', 'easy', 'medium']
     while True:
         parameters = input("Input command: ").split()
         if len(parameters) == 1 and parameters[0] == 'exit':
@@ -122,16 +180,10 @@ if __name__ == "__main__":
 
         parameters.pop(0)
         turn = 0
-        if parameters[turn % 2] == 'user':
-            get_coordinates()
-        else:
-            play_random()
+        play_move(parameters, turn)
         turn += 1
         print_field()
         while not analyse_field():
-            if parameters[turn % 2] == 'user':
-                get_coordinates()
-            else:
-                play_random()
+            play_move(parameters, turn)
             turn += 1
             print_field()
