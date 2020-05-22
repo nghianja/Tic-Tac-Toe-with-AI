@@ -1,4 +1,4 @@
-# write your code here
+# Note: coordinates (x, y) is field[y][x]
 
 field = [[' ' for j in range(4)] for i in range(4)]
 num_x = 0
@@ -51,7 +51,7 @@ def get_coordinates():
             if x < 1 or x > 3 or y < 1 or y > 3:
                 print("Coordinates should be from 1 to 3!")
                 continue
-            if field[x][y] != " ":
+            if field[y][x] != " ":
                 print("This cell is occupied! Choose another one!")
                 continue
             field[y][x] = next_move()
@@ -60,8 +60,32 @@ def get_coordinates():
             print("You should enter numbers!")
 
 
+def analyse_field():
+    wins = False
+    if (field[3][1] == field[3][2] and field[3][2] == field[3][3] and field[3][3] != " ") or \
+            (field[2][1] == field[2][2] and field[2][2] == field[2][3] and field[2][3] != " ") or \
+            (field[1][1] == field[1][2] and field[1][2] == field[1][3] and field[1][3] != " "):
+        wins = True
+    elif (field[3][1] == field[2][1] and field[2][1] == field[1][1] and field[1][1] != " ") or \
+            (field[3][2] == field[2][2] and field[2][2] == field[1][2] and field[1][2] != " ") or \
+            (field[3][3] == field[2][3] and field[2][3] == field[1][3] and field[1][3] != " "):
+        wins = True
+    elif (field[3][1] == field[2][2] and field[2][2] == field[1][3] and field[1][3] != " ") or \
+            (field[1][1] == field[2][2] and field[2][2] == field[3][3] and field[3][3] != " "):
+        wins = True
+    if not wins and num_x + num_o < 9:
+        print("Game not finished")
+    elif not wins and num_x + num_o == 9:
+        print("Draw")
+    elif wins and num_x == num_o:
+        print("O wins")
+    else:
+        print("X wins")
+
+
 if __name__ == "__main__":
     populate_field()
     print_field()
     get_coordinates()
     print_field()
+    analyse_field()
