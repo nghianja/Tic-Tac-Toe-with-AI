@@ -19,7 +19,7 @@ def get_state(symbol):
         return FieldState.X
     elif symbol == 'O':
         return FieldState.O
-    elif symbol == ' ' or symbol == '_':
+    elif symbol == ' ':
         return FieldState.FREE
     else:
         return None
@@ -36,6 +36,8 @@ class TicTacToeField:
             self.field: List[List[Optional[FieldState]]] = [
                 [None for _ in range(3)] for _ in range(3)
             ]
+
+            field = field.replace("\"", "")
 
             for row in range(3):
                 for col in range(3):
@@ -87,7 +89,7 @@ class TicTacToeField:
 
         for line in lines:
             for c in line:
-                if c not in 'XO|_ ':
+                if c not in 'XO| ':
                     return None
 
         field: List[List[Optional[FieldState]]] = [
@@ -178,14 +180,18 @@ class TicTacToeTest(StageTest):
             for _ in range(9):
                 full_game_input += full_move_input
 
-            if i % 4 == 0:
+            if i % 6 == 0:
                 initial = "start user easy\n"
-            elif i % 4 == 1:
+            elif i % 6 == 1:
                 initial = "start easy user\n"
-            elif i % 4 == 2:
+            elif i % 6 == 2:
                 initial = "start user medium\n"
-            else:
+            elif i % 6 == 3:
                 initial = "start medium user\n"
+            elif i % 6 == 4:
+                initial = "start user hard\n"
+            else:
+                initial = "start hard user\n"
 
             full_game_input = initial + full_game_input + "exit"
 
@@ -196,8 +202,17 @@ class TicTacToeTest(StageTest):
         tests += [
             TestCase(stdin="start easy easy\nexit"),
             TestCase(stdin="start medium medium\nexit"),
+            TestCase(stdin="start hard hard\nexit"),
+
             TestCase(stdin="start medium easy\nexit"),
             TestCase(stdin="start easy medium\nexit"),
+
+            TestCase(stdin="start medium hard\nexit"),
+            TestCase(stdin="start hard medium\nexit"),
+
+            TestCase(stdin="start easy hard\nexit"),
+            TestCase(stdin="start hard easy\nexit"),
+
             TestCase(stdin=
                      "start user user\n" +
                      "1 1\n" +
